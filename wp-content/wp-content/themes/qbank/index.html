@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>HCS 408 |Computer Security Quiz Game </title>
+    <meta name="viewport" content="width=1000, initial-scale=1.0, maximum-scale=1.0">
+    <link href="css/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/custom.css" rel="stylesheet" />
+    <link href="css/flat-ui.css" rel="stylesheet" />
+
+    <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Cookie' rel='stylesheet' type='text/css'>
+
+
+    <script src="js/vendor/jquery.min.js"></script>
+    <script src="js/flat-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+    <script src="./js/vendor/chart.js/Chart.min.js"></script>
+
+
+    <script>
+        // script for timer
+
+        var seconds = 0,
+            minutes = 0,
+            hours = 0,
+            t;
+
+        function add() {
+            console.log('a');
+            var h1 = $('#timer time');
+            seconds++;
+            if (seconds >= 60) {
+                seconds = 0;
+                minutes++;
+                if (minutes >= 60) {
+                    minutes = 0;
+                    hours++;
+                }
+            }
+
+            $(h1)[0].innerText =   (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds);
+
+            timer();
+        }
+
+        function timer() {
+            t = setTimeout(add, 1000);
+        }
+        timer();
+    </script>
+
+ <script src="js/questions.js" type="application/javascript" ></script>
+    <script>
+        var quiz_topic = "Computer Security Quiz";
+        var curr_index = -1;
+        var score = 0;
+        var scores = [];
+        var correct = new Audio();
+        correct.src = "sounds/correct.mp3";
+        var incorrect = new Audio();
+        incorrect.src = "sounds/incorrect.mp3";
+
+
+
+        var total = questions.length;
+
+
+        window.onload = function() {
+            $("#graph").hide(); // hide result graph
+            changeQuestion(); // show first question
+
+        };
+
+        function changeQuestion() {
+            curr_index++;
+            $('.myb').prop('disabled', false);
+
+
+            if (curr_index >= total) {
+                time_tot = document.getElementById("timer").textContent;
+                var element2 = document.getElementById("canvas");
+                element2.style.display = 'none';
+                showGraph();
+
+            } else {
+
+                var q_obj = questions[curr_index];
+                var q_h1 = q_obj.header1;
+                var q_h2 = q_obj.header2;
+                var q_text = q_obj.question;
+                var q_img = q_obj.imageurl;
+                var opt1 = q_obj.choices[0];
+                var opt2 = q_obj.choices[1];
+                var opt3 = q_obj.choices[2];
+                var opt4 = q_obj.choices[3];
+                document.getElementById("q_id").textContent = 'Question ' + (curr_index + 1) + '/' + total;
+                document.getElementById("score").textContent = 'Score ' + score + '/' + (1 * total);
+                document.getElementById("header1").textContent = q_h1;
+                document.getElementById("header2").textContent = q_h2;
+                document.getElementById("question_text").textContent = q_text;
+                document.getElementById("question_image").src = q_img;
+                document.getElementById("option1").textContent = opt1;
+                document.getElementById("option2").textContent = opt2;
+                document.getElementById("option3").textContent = opt3;
+                document.getElementById("option4").textContent = opt4;
+                document.getElementById("resource").value = quiz_topic;
+
+                
+                var elements = document.getElementsByClassName('option');
+                for (i = 0; i < elements.length; i++) {
+                    ob = elements[i];
+                    $(ob).removeClass('btn-danger');
+                    $(ob).removeClass('btn-success');
+
+                }
+
+
+            }
+        }
+
+    
+        function changeColor(obj) {
+            var selected_ans = document.getElementById($(obj).attr('id')).innerHTML;
+            if (selected_ans == questions[curr_index].answer) {
+                correct.play();
+                $(obj).addClass('btn-success');
+                score += 1;
+            } else {
+                if($(obj).attr('id') != 'pass')
+                {$(obj).addClass('btn-danger'); incorrect.play();}
+                var elements = document.getElementsByClassName('option');
+                for (i = 0; i < elements.length; i++) {
+                    ob = elements[i];
+                    var selected_ans = document.getElementById($(ob).attr('id')).innerHTML;
+
+                    if (selected_ans == questions[curr_index].answer) {
+                        $(ob).addClass('btn-success');
+                    }
+                    $(obj).blur();
+
+                }
+
+            }
+
+            setTimeout(function() {
+                $("#canvas").fadeOut();
+                setTimeout(function() {
+                    $("#canvas").fadeIn("slow", changeQuestion());
+                }, 1000);
+
+            }, 1500);
+
+            scores.push(score); 
+        }
+        </script>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+      <script src="dist/js/vendor/html5shiv.js"></script>
+      <script src="dist/js/vendor/respond.min.js"></script>
+      <![endif]-->
+</head>
+
+<body style="padding: 0 15px;">
+    <div class="" style="width:100%;">
+
+        <div id="canvas">
+            <div style="height:2px">
+                <div id="particles-js">
+                    <hr class="colorgraph">
+                </div>
+            </div>
+            <div>
+
+                <div id="particles-js" style="position:relative;">
+
+                    <center>
+                        <div class="row">
+
+
+                            <div class="col-md-2">
+                                <br/>
+                                <h3 style="font-family: 'Pacifico', cursive; font-weight:100;display:none;" id="resource">Quiz</h3>
+                                <h6 style="font-weight:500;" id="q_id">
+                                    Question 3/5</h6>
+
+                                <h4 style="font-weight:500; color:rgb(246, 227, 20)" id="score">
+                                    Score: 0</h4>
+                                <br>
+
+                                <h5>Total time elapsed:</h5>
+
+                                <h5 id="timer" style="color:white"><time>00:00:00</time></h5>
+
+<br/>
+                                <audio controls loop autoplay>
+                                    <source src="sounds/music.ogg" type="audio/ogg">
+                                    <source src="sounds/music.mp3" type="audio/mpeg">
+                                    Your browser does not support the audio element.
+                                </audio>
+
+                            </div>
+
+
+
+                            <div class="col-md-10">
+                                <h4 id="header1"></h4>
+                                <h4 id="header2"></h4>
+                                <hr/>
+                                <h3 id="question_text">Question Not Generated</h3>
+                                <img id="question_image" src="#" alt="No image" style="padding: 2%;"/>
+                                <br>
+                                <div class="btn-group-justified" style="vertical-align: middle">
+                                    <div class="row">
+                                        <div class="col-md-2 "></div>
+                                        <div class="col-md-4">
+                                            <button id="option1" class="option  btn btn-embossed btn-block btn-hg btn-info" onclick="changeColor(this)">Option Not Generated</button>
+                                            <br>
+                                        </div>
+                                        <div class="col-md-4 ">
+                                            <button id="option2" class="option btn btn-embossed btn-block btn-hg btn-info" onclick="changeColor(this)">Option Not Generated</button>
+                                            <br>
+                                        </div>
+                                        <div class="col-md-2 "></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-2 "></div>
+                                        <div class="col-md-4">
+                                            <button id="option3" class="option  btn btn-embossed btn-block btn-hg btn-info" onclick="changeColor(this)">Option Not Generated</button>
+                                            <br>
+                                        </div>
+                                        <div class="col-md-4 ">
+                                            <button id="option4" class=" option  btn btn-embossed btn-block btn-hg btn-info" onclick="changeColor(this)">Option Not Generated</button>
+                                            <br>
+                                        </div>
+                                        <div class="col-md-2 ">
+                                        </div>
+                                    </div>
+                                    <hr/>
+                                    <div class="row">
+                                        <div class="col-md-5"></div>
+                                        <div class="col-md-2">
+                                            <button id="pass" class=" option  btn btn-embossed btn-block btn-sm btn-info" onclick="changeColor(this)">Pass</button>
+                                        </div>
+                                        <div class="col-md-5"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+                        </div>
+
+                    </center>
+                    <hr class="colorgraph">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div align="center" id="graph">
+
+            <!-- Below section form is required if you want to save quiz data.. Provide appropriate action URL to backend code which handles the form data -->
+            <!--
+                <form id="quizform" method="post" action="/quiz/save-quiz/">
+                  <input type='hidden' name='csrfmiddlewaretoken' value='V1w1kYZDTc8OgYEhouCxJPADIUAMPB3w' />
+                  <input type="hidden" name="resource2" id="resource2">
+                  <input type="hidden" name="quiz_data" id="quiz_data">
+                  <input type="hidden" name="total_score" id="total_score">
+                  <input type="hidden" name="total_time" id="total_time">
+                  <input type="submit" id="save" name="mysave" style="display:none;">
+
+                </form>
+              -->
+            <center>
+                <h4>Results:</h4></center>
+            <br>
+            <canvas id="canvas" width="450" height="360"></canvas>
+            <div align="center" id="placeholder"></div>
+        </div>
+
+        <script>
+            function showGraph() {
+                $('#canvas').remove();
+                $("#graph").show();
+                var count_questions = total; 
+                var labels1 = [];
+                var str = "Q ";
+                for (var i = 0; i < count_questions; i++) {
+                    labels1[i] = str.concat((i + 1).toString());
+                }
+
+                var data = {
+                    labels: labels1,
+                    datasets: [{
+                        label: "My Stats",
+                        fillColor: "rgba(0,0,0,1)",
+                        strokeColor: "rgba(0,128,0,1)",
+                        pointColor: "rgba(256,256,256,1)",
+                        pointStrokeColor: "rgba(256,256,256,1)",
+                        pointHighlightFill: "rgba(256,256,256,1)",
+                        pointHighlightStroke: "rgba(256,256,256,1)",
+                        data: scores
+                    }]
+                };
+
+                var income = document.getElementById("canvas").getContext("2d");
+                var myLineChart = new Chart(income).Line(data, {
+
+                    scaleShowHorizontalLines: true,
+
+
+                    scaleShowVerticalLines: true,
+                    
+                    scaleLineColor: "rgba(256,256,256,.1)",
+                    bezierCurve: false
+                });
+                $("#placeholder").html("<br><h4>Total Score: " + score + "/" + (total) + "<br><br>Total Time: " + time_tot + "</h4>");
+
+                // Uncomment this function in order to save quiz
+                //saveQuiz();
+            }
+
+            /*
+            function saveQuiz()
+            {
+              document.getElementById("resource2").value = quiz_topic;
+              document.getElementById("total_score").value = parseFloat(score)*1.0/(parseFloat(total)*(1.0))*1.0;
+              document.getElementById("total_time").value = time_tot;
+              document.getElementById("quiz_data").value = JSON.stringify(questions);
+              $('#quizform').submit();
+
+            }
+
+            */
+        </script>
+    <script src="js/particles-js.js"></script>
+    <script src="js/particles-js-config.js"></script>
+</body>
+
+
+<script>
+    $(document).ready(function() {
+        $("body").css("background-color", "#000000");
+        $("body").css("color", "#ffffff");
+    });
+
+
+    boxes = $('.btn-hg');
+    maxHeight = Math.max.apply(
+        Math, boxes.map(function() {
+            return $(this).height();
+        }).get());
+    boxes.height(maxHeight + 30);
+</script>
+
+<script>
+    // Submits form for quiz saving using AJAX
+
+    /*
+      var frm2 = $('#quizform');
+
+      frm2.submit(function (ev) {
+
+        $.ajax({
+          type: frm2.attr('method'),
+          url: frm2.attr('action'),
+          data: frm2.serialize(),
+          success: function (data) {
+                   //alert('Saved');
+                 }
+               });
+
+        ev.preventDefault();
+      });
+      */
+</script>
+
+</html>
